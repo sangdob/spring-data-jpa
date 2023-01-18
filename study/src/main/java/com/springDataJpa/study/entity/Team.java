@@ -22,7 +22,6 @@ public class Team {
 
     @OneToMany(fetch = FetchType.LAZY
             , mappedBy = "team")
-    @JoinColumn(name = "member_id")
     private List<Member> members = new ArrayList<>();
 
 

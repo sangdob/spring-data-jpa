@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-//@Rollback(false)
+@Rollback(false)
 @Slf4j
 class MemberTest {
 
@@ -46,8 +46,8 @@ class MemberTest {
                 .getResultList();
 
         members.forEach(m -> {
-            log.info("member = ", m.toString());
-            log.info("member team = ", m.getTeam().toString());
+            log.info("member = {}", m.toString());
+            log.info("member team = {}", m.getTeam().toString());
         });
     }
 
