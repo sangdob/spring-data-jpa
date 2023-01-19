@@ -50,5 +50,4 @@ class MemberTest {
             log.info("member team = {}", m.getTeam().toString());
         });
     }
-
 }

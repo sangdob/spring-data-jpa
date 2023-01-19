@@ -1,7 +1,7 @@
 package com.springDataJpa.study.repository;
 
 import com.springDataJpa.study.entity.Member;
-import org.junit.jupiter.api.Assertions;
+import com.springDataJpa.study.jpaRepository.MemberJpaRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
