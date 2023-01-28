@@ -71,4 +71,9 @@ public class MemberRepositoryTest {
         assertThat(result.get(0).getUsername()).isEqualTo("usera");
         assertThat(result.get(0).getAge()).isEqualTo(20);
     }
+
+    @Test
+    public void findHelloBy() {
+        List<Member> helloBy = memberRepository.findTop3HelloBy();
+    }
 }
