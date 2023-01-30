@@ -1,6 +1,9 @@
 package com.springDataJpa.study.repository;
 
+import com.springDataJpa.study.dto.MemberDto;
 import com.springDataJpa.study.entity.Member;
+import com.springDataJpa.study.entity.Team;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,8 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
+@Slf4j
 //@Rollback(false)
 public class MemberRepositoryTest {
+    @Autowired
+    private TeamRepository teamRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -75,5 +81,34 @@ public class MemberRepositoryTest {
     @Test
     public void findHelloBy() {
         List<Member> helloBy = memberRepository.findTop3HelloBy();
+    }
+
+    @Test
+    public void findUsernameList() {
+        Member member = new Member("usera", 10);
+        Member member2 = new Member("usera", 20);
+
+        memberRepository.save(member);
+        memberRepository.save(member2);
+
+        List<String> usernameList = memberRepository.findUsernameList();
+        usernameList.forEach(e -> log.info("username = {}", e));
+    }
+
+    @Test
+    public void findMemberDto() {
+        Team teamA = new Team("teamA");
+        teamRepository.save(teamA);
+
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamB);
+
+        Member member = new Member("A", 10, teamA);
+        memberRepository.save(member);
+        Member member2 = new Member("B", 20, teamB);
+        memberRepository.save(member2);
+
+        List<MemberDto> memberDto = memberRepository.findMemberDto();
+        memberDto.forEach(dto -> log.info("memberDto = {}", dto.toString()));
     }
 }

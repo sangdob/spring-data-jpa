@@ -1,5 +1,6 @@
 package com.springDataJpa.study.repository;
 
+import com.springDataJpa.study.dto.MemberDto;
 import com.springDataJpa.study.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     /**
      * query 필수사항이 아님 namedQuery를 우선순위로 찾아 적용하도록 만들어 져 있음
+     *
      * @param username
      * @return
      */
@@ -25,4 +27,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select m from Member m where m.username = :username and m.age = :age")
     List<Member> findUser(@Param("username") String username, @Param("age") int age);
+
+    @Query("select m.username from Member m")
+    List<String> findUsernameList();
+
+    @Query("select new com.springDataJpa.study.dto.MemberDto(m.id, m.username, t.name) from Member m" +
+            " join Team t" +
+            " on m.team.id = t.id")
+    List<MemberDto> findMemberDto();
 }
