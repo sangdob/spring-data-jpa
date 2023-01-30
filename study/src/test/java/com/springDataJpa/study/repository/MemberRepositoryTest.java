@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,4 +113,16 @@ public class MemberRepositoryTest {
         List<MemberDto> memberDto = memberRepository.findMemberDto();
         memberDto.forEach(dto -> log.info("memberDto = {}", dto.toString()));
     }
+
+    @Test
+    public void findByNames() {
+        Member member = new Member("A", 10);
+        memberRepository.save(member);
+        Member member2 = new Member("B", 20);
+        memberRepository.save(member2);
+
+        List<Member> result = memberRepository.findByNames(Arrays.asList("A", "B"));
+        result.forEach(name -> log.info("name = {}", name));
+    }
+
 }

@@ -7,12 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
 //    List<Member> findByUsername(String username);
 
-    List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
+        List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
 
     List<Member> findTop3HelloBy();
 
@@ -35,4 +36,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             " join Team t" +
             " on m.team.id = t.id")
     List<MemberDto> findMemberDto();
+
+    @Query("select m from Member m where m.username in :names")
+    List<Member> findByNames(@Param("names") List<String> names);
+
+    List<Member> findListByUsernames(String username);
+
+    Member findMemberByUsername(String username);
+
+    Optional<Member> findOptionalMemberByUsername(String username);
 }
