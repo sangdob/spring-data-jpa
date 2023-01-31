@@ -17,6 +17,8 @@ class MemberJpaRepositoryTest {
 
     @Autowired
     private MemberJpaRepository memberJpaRepository;
+//    @Autowired
+//    private MemberRepository memberRepository;
 
     @Test
     public void saveMember() {
@@ -68,5 +70,24 @@ class MemberJpaRepositoryTest {
 
         assertThat(result.get(0).getUsername()).isEqualTo("usera");
         assertThat(result.get(0).getAge()).isEqualTo(20);
+    }
+
+    @Test
+    public void findByPage() {
+        memberJpaRepository.save(new Member("usera", 10));
+        memberJpaRepository.save(new Member("userB", 10));
+        memberJpaRepository.save(new Member("userC", 10));
+        memberJpaRepository.save(new Member("userD", 10));
+        memberJpaRepository.save(new Member("userE", 10));
+
+        int age = 10;
+        int offset = 0;
+        int limit = 3;
+
+        List<Member> members = memberJpaRepository.findByPage(age, offset, limit);
+        long totalCount = memberJpaRepository.totalCount(age);
+
+        assertThat(members.size()).isEqualTo(3);
+        assertThat(totalCount).isEqualTo(5L);
     }
 }
