@@ -2,6 +2,8 @@ package com.springDataJpa.study.repository;
 
 import com.springDataJpa.study.dto.MemberDto;
 import com.springDataJpa.study.entity.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,7 +15,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 //    List<Member> findByUsername(String username);
 
-        List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
+    List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
 
     List<Member> findTop3HelloBy();
 
@@ -45,4 +47,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Member findMemberByUsername(String username);
 
     Optional<Member> findOptionalMemberByUsername(String username);
+
+    Page<Member> findByAge(int age, Pageable pageable);
+
+    Page<Member> findByUsername(String username, Pageable pageable);
 }

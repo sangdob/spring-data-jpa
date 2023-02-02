@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -125,4 +128,32 @@ public class MemberRepositoryTest {
         result.forEach(name -> log.info("name = {}", name));
     }
 
+    @Test
+    public void findByPage() {
+        memberRepository.save(new Member("usera", 10));
+        memberRepository.save(new Member("userB", 10));
+        memberRepository.save(new Member("userC", 10));
+        memberRepository.save(new Member("userD", 10));
+        memberRepository.save(new Member("userE", 10));
+
+        int age = 10;
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        //when
+        Page<Member> page = memberRepository.findByAge(age, pageRequest);
+
+        //then
+        List<Member> content = page.getContent();
+        long totalCount = page.getTotalElements();
+
+        content.forEach(data -> {
+            log.info("member = {}", data.toString());});
+
+        assertThat(content.size()).isEqualTo(3);
+        assertThat(totalCount).isEqualTo(5);
+        assertThat(page.getNumber()).isEqualTo(0);
+        assertThat(page.getTotalPages()).isEqualTo(2);
+        assertThat(page.isFirst()).isTrue();
+        assertThat(page.hasNext()).isTrue();
+    }
 }
