@@ -142,18 +142,22 @@ public class MemberRepositoryTest {
         //when
         Page<Member> page = memberRepository.findByAge(age, pageRequest);
 
+        //transfer Dto
+        Page<MemberDto> toMap = page.map(member -> new MemberDto(member.getId(), member.getUsername(), null));
+
         //then
         List<Member> content = page.getContent();
         long totalCount = page.getTotalElements();
 
-        content.forEach(data -> {
+        toMap.forEach(data -> {
             log.info("member = {}", data.toString());});
 
-        assertThat(content.size()).isEqualTo(3);
+        assertThat(toMap.getContent().size()).isEqualTo(3);
         assertThat(totalCount).isEqualTo(5);
         assertThat(page.getNumber()).isEqualTo(0);
         assertThat(page.getTotalPages()).isEqualTo(2);
         assertThat(page.isFirst()).isTrue();
         assertThat(page.hasNext()).isTrue();
     }
+
 }
