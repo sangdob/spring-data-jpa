@@ -160,4 +160,16 @@ public class MemberRepositoryTest {
         assertThat(page.hasNext()).isTrue();
     }
 
+    @Test
+    public void bulkAgePlus() {
+        memberRepository.save(new Member("usera", 10));
+        memberRepository.save(new Member("userB", 15));
+        memberRepository.save(new Member("userC", 11));
+        memberRepository.save(new Member("userD", 13));
+        memberRepository.save(new Member("userE", 14));
+
+        int i = memberRepository.bulkAgePlus(13);
+
+        assertThat(i).isEqualTo(1);
+    }
 }
