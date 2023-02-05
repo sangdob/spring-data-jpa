@@ -101,6 +101,6 @@ class MemberJpaRepositoryTest {
 
         int i = memberJpaRepository.bulkAgePlus(13);
 
-        assertThat(i).isEqualTo(1);
+        assertThat(i).isEqualTo(3);
     }
 }
