@@ -170,6 +170,11 @@ public class MemberRepositoryTest {
 
         int i = memberRepository.bulkAgePlus(13);
 
+        
+        //영속성 컨텍스트 내부의 값을 불러오게 되므로 변경되지 않은 값을 가져옴
+        List<Member> userE = memberRepository.findByUsername("userE");
+        userE.forEach(e -> log.info(e.toString()));
+
         assertThat(i).isEqualTo(1);
     }
 }
