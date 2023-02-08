@@ -202,10 +202,12 @@ public class MemberRepositoryTest {
         em.flush();
         em.clear();
 
-        List<Member> members = memberRepository.findAll();
+        List<Member> members = memberRepository.findMemberFetchJoin();
 
-        members.forEach(m -> {log.info("member = {}", m.toString());
-        log.info("member.team = {}", m.getTeam().getName());
+        members.forEach(m -> {
+            log.info("member = {}", m.toString());
+            log.info("member.team = {}", m.getTeam().getName());
+            log.info("member.team.class = {}", m.getTeam().getClass());
         });
     }
 }

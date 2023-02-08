@@ -58,6 +58,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     /**
      * 복잡한 상황일 경우 countQuery를 정의 가능
+     *
      * @param age
      * @param pageable
      * @return
@@ -71,4 +72,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             flushAutomatically = true)
     @Query("update Member m set m.age = m.age + 1 where m.age >= :age")
     int bulkAgePlus(@Param("age") int age);
+
+    @Query("select m from Member m join fetch m.team")
+    List<Member> findMemberFetchJoin();
 }
