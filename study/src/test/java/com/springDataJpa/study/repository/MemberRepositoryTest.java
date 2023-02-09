@@ -210,4 +210,17 @@ public class MemberRepositoryTest {
             log.info("member.team.class = {}", m.getTeam().getClass());
         });
     }
+
+    @Test
+    public void queryHint() {
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+//      변경이 안되는 시점으로 전부 다 update가 아니도록 만등러버린다.
+        Member readOnlyByUsername = memberRepository.findReadOnlyByUsername(member1.getUsername());
+
+        em.flush();
+        em.clear();
+    }
 }
