@@ -202,7 +202,7 @@ public class MemberRepositoryTest {
         em.flush();
         em.clear();
 
-        List<Member> members = memberRepository.findMemberFetchJoin();
+        List<Member> members = memberRepository.findEntityGraphByUsername("member1");
 
         members.forEach(m -> {
             log.info("member = {}", m.toString());
