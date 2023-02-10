@@ -223,4 +223,10 @@ public class MemberRepositoryTest {
         em.flush();
         em.clear();
     }
+
+    @Test
+    public void callCustom() {
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+
+    }
 }
