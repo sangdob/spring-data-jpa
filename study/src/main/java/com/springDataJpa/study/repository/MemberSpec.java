@@ -11,7 +11,7 @@ import javax.persistence.criteria.JoinType;
 public class MemberSpec {
 
     public static Specification<Member> teamname(final String teamname) {
-        return (Specification<Member>) (root, query, criteriaBuilder) ->  {
+        return (root, query, criteriaBuilder) ->  {
             if (isEmpty(teamname)) {
                 return null;
             }
@@ -22,7 +22,7 @@ public class MemberSpec {
     }
 
     public static Specification<Member> username(final String username) {
-        return (Specification<Member>) (root, query, criteriaBuilder) ->  {
+        return (root, query, criteriaBuilder) ->  {
             Join<Member, Team> user = root.join("team", JoinType.INNER);
             return criteriaBuilder.equal(user.get("username"), username);
         };

@@ -7,9 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -249,4 +247,35 @@ public class MemberRepositoryTest {
 
         assertThat(result.size()).isEqualTo(2);
     }
+
+    /**
+     * ex: Example class
+     * inner join은 가능할지 모르나 left outer join이나 다른 조인이 사용이 힘들 수 있다.
+     */
+    @Test
+    public void queryByExample() {
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member useA = new Member("useA", 1, teamA);
+        Member useB = new Member("useB", 1, teamA);
+        em.persist(useA);
+        em.persist(useB);
+
+        em.flush();
+        em.clear();
+
+        Team team = new Team("teamA");
+        Member member = new Member("useA",15, team);
+
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching().withIgnorePaths("age");
+
+        Example<Member> of = Example.of(member, exampleMatcher);
+
+        List<Member> result = memberRepository.findAll(of);
+
+        assertThat(result.get(0).getUsername()).isEqualTo("useA");
+
+    }
+
 }
