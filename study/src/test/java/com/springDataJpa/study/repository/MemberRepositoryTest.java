@@ -278,4 +278,20 @@ public class MemberRepositoryTest {
 
     }
 
+    @Test
+    public void projections() {
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member useA = new Member("useA", 1, teamA);
+        Member useB = new Member("useB", 1, teamA);
+        em.persist(useA);
+        em.persist(useB);
+
+        em.flush();
+        em.clear();
+
+        List<UsernameOnly> result = memberRepository.findProjectionsByUsername("useA");
+        result.forEach(u -> log.info("user = {}", u.toString()));
+    }
 }
