@@ -1,6 +1,8 @@
 package com.springDataJpa.study.repository;
 
 import com.springDataJpa.study.dto.MemberDto;
+import com.springDataJpa.study.dto.UsernameOnly;
+import com.springDataJpa.study.dto.UsernameOnlyDto;
 import com.springDataJpa.study.entity.Member;
 import com.springDataJpa.study.entity.Team;
 import lombok.extern.slf4j.Slf4j;
@@ -293,5 +295,22 @@ public class MemberRepositoryTest {
 
         List<UsernameOnly> result = memberRepository.findProjectionsByUsername("useA");
         result.forEach(u -> log.info("user = {}", u.toString()));
+    }
+
+    @Test
+    public void projectionsDto() {
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member useA = new Member("useA", 1, teamA);
+        Member useB = new Member("useB", 1, teamA);
+        em.persist(useA);
+        em.persist(useB);
+
+        em.flush();
+        em.clear();
+
+        List<UsernameOnlyDto> result = memberRepository.findProjectionsDtoByUsername("useA");
+        result.forEach(u -> log.info("user = name {} age {}", u.getUsername(), u.getAge()));
     }
 }
