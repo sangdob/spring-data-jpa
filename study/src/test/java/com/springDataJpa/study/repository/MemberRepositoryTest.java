@@ -1,6 +1,7 @@
 package com.springDataJpa.study.repository;
 
 import com.springDataJpa.study.dto.MemberDto;
+import com.springDataJpa.study.dto.MemberProjection;
 import com.springDataJpa.study.dto.UsernameOnly;
 import com.springDataJpa.study.dto.UsernameOnlyDto;
 import com.springDataJpa.study.entity.Member;
@@ -312,5 +313,39 @@ public class MemberRepositoryTest {
 
         List<UsernameOnlyDto> result = memberRepository.findProjectionsDtoByUsername("useA");
         result.forEach(u -> log.info("user = name {} age {}", u.getUsername(), u.getAge()));
+    }
+
+    @Test
+    public void nativeQuery() {
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member useA = new Member("useA", 1, teamA);
+        Member useB = new Member("useB", 1, teamA);
+        em.persist(useA);
+        em.persist(useB);
+
+        em.flush();
+        em.clear();
+
+        Member result = memberRepository.findByNativeQuery("useA");
+        log.info("member = {}", result);
+    }
+
+    @Test
+    public void nativePageQuery() {
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member useA = new Member("useA", 1, teamA);
+        Member useB = new Member("useB", 1, teamA);
+        em.persist(useA);
+        em.persist(useB);
+
+        em.flush();
+        em.clear();
+
+        Page<MemberProjection> result = memberRepository.findByNativeProjections(PageRequest.ofSize(10));
+        result.getContent().forEach(m -> log.info("member username = {}, teamName = {}", m.getUsername(), m.getTeamName()));
     }
 }

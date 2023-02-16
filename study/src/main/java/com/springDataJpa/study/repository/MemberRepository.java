@@ -1,6 +1,7 @@
 package com.springDataJpa.study.repository;
 
 import com.springDataJpa.study.dto.MemberDto;
+import com.springDataJpa.study.dto.MemberProjection;
 import com.springDataJpa.study.dto.UsernameOnly;
 import com.springDataJpa.study.dto.UsernameOnlyDto;
 import com.springDataJpa.study.entity.Member;
@@ -106,4 +107,14 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     List<UsernameOnly> findProjectionsByUsername(@Param("username") String username);
 
     List<UsernameOnlyDto> findProjectionsDtoByUsername(@Param("username")String username);
+
+    @Query(value = "select * from Member m where username = ?", nativeQuery = true)
+    Member findByNativeQuery(String username);
+
+    @Query(value = "select m.member_id as id, m.username, t.name as teamName" +
+            " from member m left join team t" +
+            " on m.team_id = t.team_id"
+            , countQuery = "select count(*) from member"
+            , nativeQuery = true)
+    Page<MemberProjection> findByNativeProjections(Pageable pageable);
 }
