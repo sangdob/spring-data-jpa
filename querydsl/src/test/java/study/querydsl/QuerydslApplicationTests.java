@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
+import study.querydsl.entity.QTeam;
 import study.querydsl.entity.Team;
 
 import javax.persistence.EntityManager;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static study.querydsl.entity.QMember.*;
+import static study.querydsl.entity.QTeam.*;
 
 @SpringBootTest
 @Transactional
@@ -156,11 +158,30 @@ class QuerydslApplicationTests {
 						member.age.min())
 				.from(member)
 				.fetch();
+
 		Tuple tuple = result.get(0);
 		assertThat(tuple.get(member.count())).isEqualTo(3);
 		assertThat(tuple.get(member.age.sum())).isEqualTo(30);
 		assertThat(tuple.get(member.age.avg())).isEqualTo(10);
 		assertThat(tuple.get(member.age.max())).isEqualTo(15);
 		assertThat(tuple.get(member.age.min())).isEqualTo(5);
+	}
+
+	@Test
+	public void group() {
+		List<Tuple> fetch = query.select(team.name, member.age.avg())
+				.from(member)
+				.join(member.team, team)
+				.groupBy(team.name)
+				.fetch();
+
+		Tuple teamA = fetch.get(0);
+		Tuple teamB = fetch.get(1);
+
+		assertThat(teamA.get(team.name)).isEqualTo("teamA");
+		assertThat(teamA.get(member.age.avg())).isEqualTo(15);
+
+		assertThat(teamB.get(team.name)).isEqualTo("teamB");
+		assertThat(teamB.get(member.age.avg())).isEqualTo(7.5);
 	}
 }
