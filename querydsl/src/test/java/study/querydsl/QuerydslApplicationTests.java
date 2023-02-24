@@ -184,4 +184,47 @@ class QuerydslApplicationTests {
 		assertThat(teamB.get(team.name)).isEqualTo("teamB");
 		assertThat(teamB.get(member.age.avg())).isEqualTo(7.5);
 	}
+
+	@Test
+	public void join() {
+		List<Member> teamA = query.selectFrom(member)
+				.join(member.team, team)
+				.where(team.name.eq("teamA"))
+				.fetch();
+
+		assertThat(teamA).extracting("username")
+				.containsExactly("member1");
+	}
+
+	@Test
+	public void leftJoin() {
+		List<Member> teamA = query.selectFrom(member)
+			.leftJoin(member.team, team)
+			.where(team.name.eq("teamA"))
+			.fetch();
+
+		assertThat(teamA).extracting("username")
+				.containsExactly("member1");
+	}
+
+
+	/**
+	 * 세타 조인 (연간관계가 없는 필드로 조인하는 방법)
+	 * 회원의 이름이 팀 이름과 같은 회원 조회
+	 */
+	@Test
+	public void thetaJoin() {
+		em.persist(new Member("teamA"));
+		em.persist(new Member("teamB"));
+		em.persist(new Member("teamC"));
+
+		List<Member> result = query.select(member)
+				.from(member, team)
+				.where(member.username.eq(team.name))
+				.fetch();
+
+		assertThat(result)
+				.extracting("username")
+				.containsExactly("teamA", "teamB");
+	}
 }

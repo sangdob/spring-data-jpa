@@ -30,6 +30,10 @@ public class Member {
         this.team = team;
     }
 
+    public Member(String username) {
+        this.username = username;
+    }
+
     public void changeTeam(Team team) {
         this.team = team;
         team.getMembers().add(this);
