@@ -237,4 +237,19 @@ public class QuerydslBasicTest {
 
         result.forEach(t -> log.info("tuple = {}", t));
     }
+
+    /**
+     * 외부조인일 경우 활용
+     */
+    @Test
+    public void joinWhereFiltering() {
+        List<Tuple> result = query.select(member, team)
+                .from(member)
+                .join(member.team, team)
+//                .on(team.name.eq("teamA"))
+                .where(team.name.eq("teamA"))
+                .fetch();
+
+        result.forEach(t -> log.info("tuple = {}", t));
+    }
 }
