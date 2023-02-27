@@ -2,6 +2,7 @@ package study.querydsl;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
+import study.querydsl.entity.QMember;
 import study.querydsl.entity.QTeam;
 import study.querydsl.entity.Team;
 
@@ -31,6 +33,9 @@ public class QuerydslBasicTest {
     EntityManager em;
 
     JPAQueryFactory query;
+
+    @PersistenceUnit
+    EntityManagerFactory emf;
 
     @BeforeEach
     public void before() {
@@ -255,8 +260,6 @@ public class QuerydslBasicTest {
         result.forEach(t -> log.info("tuple = {}", t));
     }
 
-    @PersistenceUnit
-    EntityManagerFactory emf;
 
     @Test
     public void fetchJoinNo() {
@@ -285,5 +288,58 @@ public class QuerydslBasicTest {
 
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
         assertThat(loaded).as("fetch join no").isTrue();
+    }
+
+    /**
+     * 나이가 가장 많은 회원
+     */
+    @Test
+    public void subQuery() {
+//        Member findMember = query.select(member)
+//                .from(member)
+//                .join(member.team, team)
+//                .fetchJoin()
+//                .orderBy(member.age.desc())
+//                .limit(1)
+//                .fetchOne();
+
+        QMember subMember = new QMember("memberSub");
+
+        List<Member> result = query.selectFrom(member)
+                .where(member.age.eq(
+                        JPAExpressions
+                                .select(subMember.age.max())
+                                .from(subMember)
+                ))
+                .fetch();
+
+        log.info("old one = {}", result.get(0).toString());
+
+        assertThat(result).extracting("age")
+                .containsExactly(15);
+
+    }
+    
+    /**
+     * 나이가 평균 이상인 회원
+     */
+    @Test
+    public void subQueryGoe() {
+        QMember subMember = new QMember("memberSub");
+        
+        List<Member> result = query
+                .selectFrom(member)
+                .where(member.age.goe(
+                        JPAExpressions
+                                .select(subMember.age.avg())
+                                .from(subMember)
+                ))
+                .fetch();
+
+        result.forEach(m -> log.info("{}", m.toString()));
+
+//        순서가 섞일 경우 테스트에 지장이 간다..... list 순서대로 테스팅
+        assertThat(result).extracting("age")
+                .containsExactly(15, 10);
     }
 }
