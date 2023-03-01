@@ -20,6 +20,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import java.util.List;
 
+import static com.querydsl.jpa.JPAExpressions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.entity.QMember.member;
 import static study.querydsl.entity.QTeam.team;
@@ -307,8 +308,7 @@ public class QuerydslBasicTest {
 
         List<Member> result = query.selectFrom(member)
                 .where(member.age.eq(
-                        JPAExpressions
-                                .select(subMember.age.max())
+                        select(subMember.age.max())
                                 .from(subMember)
                 ))
                 .fetch();
@@ -330,8 +330,7 @@ public class QuerydslBasicTest {
         List<Member> result = query
                 .selectFrom(member)
                 .where(member.age.goe(
-                        JPAExpressions
-                                .select(subMember.age.avg())
+                        select(subMember.age.avg())
                                 .from(subMember)
                 ))
                 .fetch();
@@ -341,5 +340,19 @@ public class QuerydslBasicTest {
 //        순서가 섞일 경우 테스트에 지장이 간다..... list 순서대로 테스팅
         assertThat(result).extracting("age")
                 .containsExactly(15, 10);
+    }
+
+    @Test
+    public void selectSubQuery() {
+        QMember subMember = new QMember("memberSub");
+
+        List<Tuple> result = query.select(member.username,
+                        select(subMember.age.avg())
+                                .from(subMember))
+                .from(member)
+                .fetch();
+
+        result.forEach(r -> log.info("result = {}", r));
+
     }
 }
