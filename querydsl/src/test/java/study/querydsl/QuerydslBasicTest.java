@@ -2,6 +2,7 @@ package study.querydsl;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -354,5 +355,30 @@ public class QuerydslBasicTest {
 
         result.forEach(r -> log.info("result = {}", r));
 
+    }
+
+    @Test
+    public void basicCase() {
+        List<String> caseResult = query.select(member.age
+                        .when(10).then("10years")
+                        .when(15).then("15years")
+                        .otherwise("others"))
+                .from(member)
+                .fetch();
+
+        caseResult.forEach(r -> log.info("member years = {}", r));
+
+    }
+
+    @Test
+    public void complexCase() {
+        List<String> result = query.select(new CaseBuilder()
+                        .when(member.age.between(0, 10)).then("0~10")
+                        .when(member.age.between(10, 20)).then("10~20")
+                        .otherwise("others"))
+                .from()
+                .fetch();
+
+        result.forEach(r -> log.info("member years = {}", r));
     }
 }
