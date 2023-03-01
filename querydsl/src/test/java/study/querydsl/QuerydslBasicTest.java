@@ -3,6 +3,8 @@ package study.querydsl;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -13,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import study.querydsl.dto.MemberDto;
+import study.querydsl.dto.UserDto;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
 import study.querydsl.entity.QTeam;
@@ -23,6 +27,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import java.util.List;
 
+import static com.querydsl.core.types.Projections.*;
 import static com.querydsl.jpa.JPAExpressions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.entity.QMember.member;
@@ -401,5 +406,102 @@ public class QuerydslBasicTest {
                 .fetch();
 
         result.forEach(r -> log.info("member = {}", r));
+    }
+
+    @Test
+    public void simpleProjection() {
+        List<String> result = query.select(member.username)
+                .from(member)
+                .fetch();
+
+        result.forEach(r -> log.info("result = {}", r));
+    }
+
+    @Test
+    public void tupleProjection() {
+        List<Tuple> result = query.select(member.username
+                        , member.age)
+                .from(member)
+                .fetch();
+
+        result.forEach(r -> log.info("result = {}", r));
+    }
+
+    @Test
+    public void findDtoByJPQL() {
+        List<MemberDto> result = em.createQuery("select new study.querydsl.dto.MemberDto(m.username, m.age) " +
+                        "from Member m"
+                        , MemberDto.class)
+                .getResultList();
+
+        result.forEach(r -> log.info(r.toString()));
+    }
+
+    @Test
+    public void findDtoBySetter() {
+        List<MemberDto> result = query
+                .select(bean(MemberDto.class
+                        , member.username
+                        , member.age))
+                .from(member)
+                .fetch();
+
+        result.forEach(r -> log.info(r.toString()));
+    }
+
+    @Test
+    public void findDtoByField() {
+        List<MemberDto> result = query
+                .select(fields(MemberDto.class
+                        , member.username
+                        , member.age))
+                .from(member)
+                .fetch();
+
+        result.forEach(r -> log.info(r.toString()));
+    }
+
+    /**
+     * 이름이 다를 경우 컬럼의 이름을 변경
+     */
+    @Test
+    public void findUserDto() {
+        List<UserDto> result = query
+                .select(fields(UserDto.class
+                        , member.username.as("name")
+                        , member.age))
+                .from(member)
+                .fetch();
+
+        result.forEach(r -> log.info(r.toString()));
+    }
+
+    @Test
+    public void findUserDtoSubQuery() {
+        QMember subMember = new QMember("subMember");
+
+        List<UserDto> result = query
+                .select(fields(UserDto.class
+                        , member.username.as("name")
+                        , ExpressionUtils
+                                .as(select(subMember.age.max())
+                                        .from(subMember), "age")
+                ))
+                .from(member)
+                .fetch();
+
+        result.forEach(r -> log.info(r.toString()));
+    }
+
+    @Test
+    public void findDtoByConstructor() {
+        List<MemberDto> result = query
+                .select(constructor(MemberDto.class
+                        , member.username
+                        , member.age))
+                .from(member)
+                .fetch();
+
+        result.forEach(r -> log.info(r.toString()));
     }
 }
