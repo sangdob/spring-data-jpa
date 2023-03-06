@@ -6,6 +6,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -82,7 +83,7 @@ public class QuerydslBasicTest {
     public void startQuerydsl() {
         Member findMember = query.select(member)
                 .from(member)
-                .where(member.username.eq("member1"))
+                .where(usernameEq("member1"))
                 .fetchOne();
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
@@ -91,8 +92,8 @@ public class QuerydslBasicTest {
     @Test
     public void search() {
         Member findMember = query.selectFrom(member)
-                .where(member.username.eq("member1")
-                        .and(member.age.eq(15)))
+                .where(usernameEq("member1")
+                        .and(ageEq(15)))
                 .fetchOne();
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
@@ -129,7 +130,7 @@ public class QuerydslBasicTest {
         em.persist(new Member("member6", 100, null));
 
         List<Member> result = query.selectFrom(member)
-                .where(member.age.eq(100))
+                .where(ageEq(100))
                 .orderBy(member.age.desc(), member.username.asc().nullsLast())
                 .fetch();
 
@@ -279,7 +280,7 @@ public class QuerydslBasicTest {
 
         Member findMember = query.selectFrom(member)
                 .join(member.team, team)
-                .where(member.username.eq("member1"))
+                .where(usernameEq("member1"))
                 .fetchOne();
 
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
@@ -294,7 +295,7 @@ public class QuerydslBasicTest {
         Member findMember = query.selectFrom(member)
                 .join(member.team, team)
                 .fetchJoin()
-                .where(member.username.eq("member1"))
+                .where(usernameEq("member1"))
                 .fetchOne();
 
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
@@ -327,7 +328,6 @@ public class QuerydslBasicTest {
 
         assertThat(result).extracting("age")
                 .containsExactly(15);
-
     }
     
     /**
@@ -530,15 +530,46 @@ public class QuerydslBasicTest {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (usernameParam != null) {
-            builder.and(member.username.eq(usernameParam));
+            builder.and(usernameEq(usernameParam));
         }
 
-        if (ageParam != 0) {
-            builder.and(member.age.eq(ageParam));
+        if (ageParam != null) {
+            builder.and(ageEq(ageParam));
         }
 
-        return query.selectFrom(member)
+        return query
+                .selectFrom(member)
                 .where(builder)
                 .fetch();
+    }
+
+    @Test
+    public void dynamicQuery_WhereParam() {
+        String usernameParam = "member1";
+        Integer ageParam = 15;
+
+        List<Member> result = searchMember2(usernameParam, ageParam);
+
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getUsername()).isEqualTo(usernameParam);
+        assertThat(result.get(0).getAge()).isEqualTo(ageParam);
+    }
+
+    private List<Member> searchMember2(String usernameParam, Integer ageParam) {
+        return query.selectFrom(member)
+                .where(usernameEq(usernameParam), ageEq(ageParam))
+                .fetch();
+    }
+
+    private BooleanExpression usernameEq(String usernameParam) {
+        return usernameParam != null ? member.username.eq(usernameParam) : null;
+    }
+
+    private BooleanExpression ageEq(Integer ageParam) {
+        return ageParam != null ? member.age.eq(ageParam) : null;
+    }
+
+    private BooleanExpression allEq(String usernameCond, Integer ageCond){
+        return usernameEq(usernameCond).and(ageEq(ageCond));
     }
 }
