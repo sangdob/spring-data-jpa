@@ -555,6 +555,37 @@ public class QuerydslBasicTest {
         assertThat(result.get(0).getAge()).isEqualTo(ageParam);
     }
 
+    @Test
+    public void bulkUpdate() {
+//      lt : this < right
+
+        // member 1 = 10
+        // member 2 = 5
+        long count = query.update(member)
+                .set(member.username, "비회원")
+                .where(member.age.lt(15))
+                .execute();
+
+        List<Member> result = query
+                .selectFrom(member)
+                .fetch();
+
+        result.forEach(r -> log.info(r.toString()));
+
+        assertThat(count).isEqualTo(2);
+    }
+
+    @Test
+    public void bulkAdd() {
+        long count = query.update(member)
+                .set(member.age, member.age.add(1))
+                .execute();
+    }
+
+    @Test
+    public void bulkDelete() {
+    }
+
     private List<Member> searchMember2(String usernameParam, Integer ageParam) {
         return query.selectFrom(member)
                 .where(usernameEq(usernameParam), ageEq(ageParam))
