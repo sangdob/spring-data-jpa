@@ -10,6 +10,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPADeleteClause;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -583,7 +584,18 @@ public class QuerydslBasicTest {
     }
 
     @Test
+    public void bulkMul() {
+        long count = query.update(member)
+                .set(member.age, member.age.multiply(2))
+                .execute();
+    }
+
+    @Test
     public void bulkDelete() {
+        long count = query.delete(member)
+                .where(member.age.gt(10))
+                .execute();
+
     }
 
     private List<Member> searchMember2(String usernameParam, Integer ageParam) {
