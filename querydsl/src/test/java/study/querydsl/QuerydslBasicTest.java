@@ -32,6 +32,7 @@ import javax.persistence.PersistenceUnit;
 import java.util.List;
 
 import static com.querydsl.core.types.Projections.*;
+import static com.querydsl.core.types.dsl.Expressions.*;
 import static com.querydsl.jpa.JPAExpressions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.entity.QMember.member;
@@ -595,7 +596,30 @@ public class QuerydslBasicTest {
         long count = query.delete(member)
                 .where(member.age.gt(10))
                 .execute();
+    }
 
+    @Test
+    public void sqlFunction() {
+        List<String> result = query
+                .select(stringTemplate("function('replace', {0}, {1}, {2})"
+                        , member.username
+                        , "member"
+                        , "M"))
+                .from(member)
+                .fetch();
+
+        result.forEach(r -> log.info("r = {}", r));
+    }
+
+    @Test
+    public void sqlFunction2() {
+        List<String> result = query.select(member.username)
+                .from(member)
+                .where(member.username.eq(stringTemplate("function('lower', {0})"
+                        , member.username)))
+                .fetch();
+
+        result.forEach(r -> log.info(r));
     }
 
     private List<Member> searchMember2(String usernameParam, Integer ageParam) {
