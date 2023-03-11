@@ -615,8 +615,9 @@ public class QuerydslBasicTest {
     public void sqlFunction2() {
         List<String> result = query.select(member.username)
                 .from(member)
-                .where(member.username.eq(stringTemplate("function('lower', {0})"
-                        , member.username)))
+                .where(member.username.eq(member.username.lower()))
+//                .where(member.username.eq(stringTemplate("function('lower', {0})"
+//                        , member.username)))
                 .fetch();
 
         result.forEach(r -> log.info(r));
