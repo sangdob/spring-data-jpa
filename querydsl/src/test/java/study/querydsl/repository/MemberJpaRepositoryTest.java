@@ -1,7 +1,6 @@
 package study.querydsl.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,9 +36,7 @@ class MemberJpaRepositoryTest {
         List<Member> result = memberJpaRepository.findAll();
         assertThat(result).containsExactly(member);
 
-        List<Member> result2 = memberJpaRepository.findByUsernmae(member.getUsername());
+        List<Member> result2 = memberJpaRepository.findByUsername(member.getUsername());
         assertThat(result2).containsExactly(member);
-
-
     }
 }
