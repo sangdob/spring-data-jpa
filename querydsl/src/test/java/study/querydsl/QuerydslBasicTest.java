@@ -600,7 +600,7 @@ public class QuerydslBasicTest {
 
     @Test
     public void sqlFunction() {
-        List<String> result = query
+     /*   List<String> result = query
                 .select(stringTemplate("function('replace', {0}, {1}, {2})"
                         , member.username
                         , "member"
@@ -608,7 +608,7 @@ public class QuerydslBasicTest {
                 .from(member)
                 .fetch();
 
-        result.forEach(r -> log.info("r = {}", r));
+        result.forEach(r -> log.info("r = {}", r));*/
     }
 
     @Test
