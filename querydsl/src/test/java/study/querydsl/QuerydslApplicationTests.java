@@ -24,4 +24,5 @@ import static study.querydsl.entity.QTeam.*;
 
 @SpringBootTest
 class QuerydslApplicationTests {
+
 }
